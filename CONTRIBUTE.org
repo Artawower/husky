@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID: husky-contribution
+:END:
+
+#+TITLE: Contribution Guide
+
+* Contribution GuideWelcome to the project! We appreciate your interest in contributing. This guide will help you get started.
+** Programming Principles
+We adhere to the following principles to ensure code quality and maintainability. These principles are crucial because I primarily work alone on this project, and they help me efficiently support new features while minimizing technical debt:
+- Follow the [[https://en.wikipedia.org/wiki/SOLID][SOLID principles]].
+- Practice [[https://martinfowler.com/bliki/Yagni.html][YAGNI (You Aren't Gonna Need It)]] by not adding unnecessary functionality.
+- Keep designs simple by adhering to the [[https://en.wikipedia.org/wiki/KISS_principle][KISS principle]].
+- Avoid code repetition with the [[https://en.wikipedia.org/wiki/Don%27t_repeat_yourself][DRY principle]].
+- Write code that is clean and maintainable, as outlined in the [[https://www.oreilly.com/library/view/clean-code/9780136083238/][Clean Code book]].
+These principles ensure the codebase remains manageable, reducing the time and effort needed to maintain and extend the project.
+
+** Code Style
+- Use a linter to maintain code consistency. For Emacs packages, you can use `checkdoc` and `flycheck`.
+- Ensure all your code is properly documented following Emacs Lisp conventions. 
+- [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Documentation-Tips.html][Checkdoc Documentation]]
+
+* Testing
+- All new features and bug fixes should be accompanied by tests.
+- Write unit tests using the `ert` framework.
+- [[https://www.gnu.org/software/emacs/manual/html_node/ert/index.html][ERT Documentation]]
+
+** Submitting Contributions
+- Fork the repository and create a new branch for your feature or bugfix.
+- Write clear, concise commit messages.
+- Submit a pull request with a description of your changes.
+
+** Linting and Documentation Checks
+- Run `checkdoc` to ensure your documentation follows Emacs Lisp standards.
+- Use `flycheck` to catch syntax errors and warnings.
+
+** Donations
+If you find this project helpful, consider supporting it by donating:
+
+#+html: <div align='center'>
+#+html: <span class='badge-buymeacoffee'>
+#+html: <a href='https://www.paypal.me/darkawower' title='Paypal' target='_blank'><img src='https://img.shields.io/badge/paypal-donate-blue.svg' alt='Buy Me A Coffee donate button' /></a>
+#+html: </span>
+#+html: <span class='badge-patreon'>
+#+html: <a href='https://patreon.com/artawower' target='_blank' title='Donate to this project using Patreon'><img src='https://img.shields.io/badge/patreon-donate-orange.svg' alt='Patreon donate button' /></a>
+#+html: </span>
+#+html: </div>
+
+** Contact
+For any questions or support, feel free to reach out via the project's issue tracker or contact me directly.
+Thank you for contributing!

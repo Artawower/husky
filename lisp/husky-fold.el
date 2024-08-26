@@ -3,7 +3,7 @@
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
 ;; Package-Requires: (("emacs" "29.1") ("husky-tools" "0.0.2"))
-;; Version: 0.0.5
+;; Version: 0.0.6
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,22 +33,20 @@
   "Close all folds."
 
   (interactive)
-  (cond ((equal major-mode 'org-mode) (husky-org-close-all-folds))
-        ((hf--origami-fold-fn-present-p origami-close-all-nodes) (call-interactively 'origami-close-all-nodes))
-        ((hf--treesit-fold-fn-present-p treesit-fold-close-all) (treesit-fold-close-all))
-        ((husky-tools-mode-fn-exist-p evil-mode 'evil-close-folds) (evil-close-folds))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-close-all-folds)
+      (hf--origami-fold-fn-called-p 'origami-close-all-nodes (current-buffer))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-close-all)
+      (hf--no-folding-provided-msg)))
 
 ;;;###autoload
 (defun hf-close ()
   "Close the fold under the cursor."
 
   (interactive)
-  (cond ((equal major-mode 'org-mode) (husky-org-close-fold))
-        ((hf--origami-fold-fn-present-p origami-close-node) (call-interactively 'origami-close-node))
-        ((hf--treesit-fold-fn-present-p treesit-fold-close) (treesit-fold-close))
-        ((husky-tools-mode-fn-exist-p evil-mode 'evil-close-fold) (evil-close-fold))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-close-fold)
+      (hf--origami-fold-fn-called-p 'origami-close-node (current-buffer) (point))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-close)
+      (hf--no-folding-provided-msg)))
 
 
 ;;;###autoload
@@ -56,33 +54,33 @@
   "Open all folds."
 
   (interactive)
-  (cond ((equal major-mode 'org-mode) (husky-org-open-all-folds))
-        ((hf--origami-fold-fn-present-p origami-open-all-nodes) (call-interactively 'origami-open-all-nodes))
-        ((hf--treesit-fold-fn-present-p treesit-fold-open-all) (treesit-fold-open-all))
-        ((husky-tools-mode-fn-exist-p evil-mode 'evil-open-folds) (evil-open-folds))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-open-all-folds)
+      (hf--origami-fold-fn-called-p 'origami-open-all-nodes (current-buffer))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-open-all)
+      (hf--evil-fold-fn-called-p 'evil-open-folds)
+      (hf--no-folding-provided-msg)))
 
 ;;;###autoload
 (defun hf-open ()
   "Open the fold under the cursor."
 
   (interactive)
-  (cond ((equal major-mode 'org-mode) (husky-org-open-fold))
-        ((hf--origami-fold-fn-present-p origami-open-node) (call-interactively 'origami-open-node))
-        ((hf--treesit-fold-fn-present-p treesit-fold-open) (treesit-fold-open))
-        ((husky-tools-mode-fn-exist-p evil-mode 'evil-open-fold) (evil-open-fold))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-open-fold)
+      (hf--origami-fold-fn-called-p 'origami-open-node (current-buffer) (point))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-open)
+      (hf--evil-fold-fn-called-p 'evil-open-fold)
+      (hf--no-folding-provided-msg)))
 
 ;;;###autoload
 (defun hf-toggle-all ()
   "Toggle all folds."
 
   (interactive)
-  (cond ((equal major-mode 'org-mode) (husky-org-toggle-fold))
-        ((hf--origami-fold-fn-present-p origami-toggle-all-nodes) (call-interactively 'origami-toggle-all-nodes))
-        ((hf--treesit-fold-fn-present-p treesit-fold-toggle-all) (treesit-fold-toggle-all))
-        ((husky-tools-mode-fn-exist-p evil-mode 'evil-toggle-folds) (evil-toggle-folds))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'ignore)
+      (hf--origami-fold-fn-called-p 'origami-toggle-all-nodes (current-buffer))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-toggle-all)
+      (hf--evil-fold-fn-called-p 'evil-toggle-folds)
+      (hf--no-folding-provided-msg)))
 
 ;;;###autoload
 (defun hf-toggle ()
@@ -91,46 +89,61 @@
   (interactive)
   (save-excursion
     (end-of-line)
-    (cond ((equal major-mode 'org-mode) (husky-org-toggle-fold))
-          ((hf--origami-fold-fn-present-p origami-toggle-node) (origami-toggle-node (current-buffer) (point)))
-          ((hf--treesit-fold-fn-present-p treesit-fold-toggle) (treesit-fold-toggle))
-          ((husky-tools-mode-fn-exist-p evil-mode 'evil-toggle-fold) (evil-toggle-fold))
-          (t (message hf--no-folding-mode-msg)))))
+    (or (hf--org-fold-fn-called-p 'husky-org-toggle-fold)
+        (hf--origami-fold-fn-called-p 'origami-toggle-node (current-buffer) (point))
+        (hf--treesit-fold-fn-called-p 'treesit-fold-toggle)
+        (hf--evil-fold-fn-called-p 'evil-toggle-fold)
+        (hf--no-folding-provided-msg))))
 
 ;;;###autoload
 (defun hf-next ()
   "Go to the next fold."
 
   (interactive)
-  (cond ((hf--origami-fold-fn-present-p origami-next-fold) (call-interactively 'origami-next-fold))
-        ((hf--treesit-fold-fn-present-p treesit-fold-next) (treesit-fold-next))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-next-fold)
+      (hf--origami-fold-fn-called-p 'origami-next-fold (current-buffer) (point))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-next)
+      (hf--no-folding-provided-msg)))
 
 ;;;###autoload
 (defun hf-previous ()
   "Go to the previous fold."
 
   (interactive)
-  (cond ((hf--origami-fold-fn-present-p origami-previous-fold) (call-interactively 'origami-previous-fold))
-        ((hf--treesit-fold-fn-present-p treesit-fold-previous) (treesit-fold-previous))
-        (t (message hf--no-folding-mode-msg))))
+  (or (hf--org-fold-fn-called-p 'husky-org-previous-fold)
+      (hf--origami-fold-fn-called-p 'origami-previous-fold (current-buffer) (point))
+      (hf--treesit-fold-fn-called-p 'treesit-fold-previous)
+      (hf--no-folding-provided-msg)))
 
 
-(defmacro hf--treesit-fold-fn-present-p (fn)
-  "Return t if `treesit-fold-mode' is enabled and FN present."
-  `(and (bound-and-true-p treesit-fold-mode) (fboundp ',fn)))
+(defun hf--org-fold-fn-called-p (fn &rest args)
+  "Return t and call FN with ARGS when active mode is `org-mode' and FN present."
+  (when (and (equal major-mode 'org-mode) (fboundp fn))
+    (apply fn args)
+    t))
 
-(defmacro hf--origami-fold-fn-present-p (fn)
-  "Return t if `origami-mode' is enabled and FN present."
-  `(and (bound-and-true-p origami-mode) (fboundp ',fn)))
+(defun hf--origami-fold-fn-called-p (fn &rest args)
+  "Return t and call FN with ARGS when FN present."
+  (when (and (bound-and-true-p origami-mode) (fboundp fn))
+    (apply fn args)
+    t))
 
+(defun hf--treesit-fold-fn-called-p (fn &rest args)
+  "Return t and call FN with ARGS when FN present."
+  (when (and (bound-and-true-p treesit-mode) (fboundp fn))
+    (apply fn args)
+    t))
 
-(defun hf--test-run1 ()
-  "Just a test run."
-  (interactive)
-  (message "macroexpand fn: %s" (macroexpand-all `(hf--origami-fold-fn-present-p origami-toggle-node)))
-  (message "toggle present:? %s" (hf--origami-fold-fn-present-p origami-toggle-node))
-  (call-interactively 'origami-toggle-node))
+(defun hf--evil-fold-fn-called-p (fn &rest args)
+  "Return t and call FN with ARGS when FN present."
+  (when (and (bound-and-true-p evil-mode) (fboundp fn))
+    (apply fn args)
+    t))
+
+(defun hf--no-folding-provided-msg ()
+  "Return message about no folding provided."
+  (message hf--no-folding-mode-msg))
+
 
 (provide 'husky-fold)
 

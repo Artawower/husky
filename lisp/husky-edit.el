@@ -46,10 +46,10 @@
 ;;;###autoload
 (defun he-insert--todo-by-current-git-branch (todo-type)
   "Insert todo with TODO-TYPE name for current git branch."
-  (when-let* ((branch-name (ht-call-function-if-exists 'magit-get-current-branch))
-              (task (string-match he-branch-regexp branch-name))
-              (task-number (match-string he-branch-regexp-match-number branch-name))
-              (todo-msg (or task-number branch-name)))
+  (let* ((branch-name (husky-tools-call-function-if-exists magit-get-current-branch))
+         (task (string-match he-branch-regexp branch-name))
+         (task-number (match-string he-branch-regexp-match-number branch-name))
+         (todo-msg (or task-number branch-name)))
     (insert (format "%s: %s " todo-type todo-msg))
     (comment-line 1)
     (previous-line)

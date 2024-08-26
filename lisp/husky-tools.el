@@ -27,7 +27,7 @@
 (defmacro ht-call-function-if-exists (function &rest args)
   "Call FUNCTION with ARGS if it exists."
   `(if (fboundp ',function)
-       (apply ',function ,@args)))
+       (funcall ',function ,@args)))
 
 
 ;;;###autoload

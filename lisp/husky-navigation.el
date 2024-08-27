@@ -3,7 +3,7 @@
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
 ;; Package-Requires: ()
-;; Version: 0.0.2
+;; Version: 0.0.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -67,6 +67,18 @@
 
           (t (progn (message "%s" "Not on a paren, brace, or bracket")
                     nil)))))
+;;;###autoload
+(defun hn-mark-avy-goto-word-1 (&optional symbol-p)
+  "Go to the first word within avy and mark it if mode allow.
+When SYMBOL-P specified, mark symbol instead of word."
+  (interactive)
+  (when (fboundp 'avy-goto-word-1)
+    (call-interactively 'avy-goto-word-1)
+    (when (and (bound-and-true-p meow-normal-mode)
+               (fboundp 'meow-mark-word)
+               (fboundp 'meow-mark-symbol))
+      (funcall (if symbol-p #'meow-mark-symbol #'meow-mark-word) 0)))
+  )
 
 (provide 'husky-navigation)
 

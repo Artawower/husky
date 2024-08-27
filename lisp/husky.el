@@ -3,7 +3,7 @@
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
 ;; Package-Requires: ((emacs "29.1"))
-;; Version: 0.0.4
+;; Version: 0.0.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

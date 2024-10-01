@@ -52,18 +52,19 @@
         (t nil)))
 
 ;;;###autoload
-(defun hn-bounce-paren ()
+(defun husky-navigation-bounce-paren ()
   "Move to the matching parenthesis or tag if on parenthesis."
   (interactive)
   (let ((prev-char (char-to-string (preceding-char)))
         (next-char (char-to-string (following-char))))
-    (cond ((eq major-mode 'web-mode) (hn--jump-to-matching-tag))
+    (cond ((member (following-char) '(?\) ?\] ?\} ?\>)) (bh--jump-to-parenthesis))
+          ((string-match "[[{(<]" next-char) (bh--jump-to-parenthesis))
+          ((string-match "[\]})>]" prev-char) (bh--jump-to-parenthesis))
+          ((eq major-mode 'web-mode) (hn--jump-to-matching-tag))
           ((eq major-mode 'html-mode) (hn--jump-to-matching-tag))
           ((eq major-mode 'html-ts-mode) (hn--jump-to-matching-tag))
           ((eq major-mode 'ng2-html-mode) (hn--jump-to-matching-tag))
-          ((member (following-char) '(?\) ?\] ?\} ?\>)) (bh--jump-to-parenthesis))
-          ((string-match "[[{(<]" next-char) (bh--jump-to-parenthesis))
-          ((string-match "[\]})>]" prev-char) (bh--jump-to-parenthesis))
+          
 
           (t (progn (message "%s" "Not on a paren, brace, or bracket")
                     nil)))))

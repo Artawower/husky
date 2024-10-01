@@ -524,7 +524,6 @@ All my (performant) foldings needs are met between this and `org-show-subtree'
           (org-cycle-internal-local)
           t)))))
 
-
 ;;;###autoload
 (defun ho-remove-occur-highlights-h ()
   "Remove org occur highlights on ESC in normal mode."
@@ -538,6 +537,25 @@ All my (performant) foldings needs are met between this and `org-show-subtree'
   (when (bound-and-true-p evil-local-mode)
     (add-hook 'evil-insert-state-exit-hook #'org-update-parent-todo-statistics nil t))
   (add-hook 'before-save-hook #'org-update-parent-todo-statistics nil t))
+
+
+(defun ho-add-additional-space-when-not-exist (_)
+  "Add additional sapce if previous char is not space!"
+  (unless (eq (char-before) ? )
+    (insert " ")))
+
+
+
+;;;###autoload
+(defun ho-setup-org-advices ()
+  "Setup advices for better work with org mode."
+  (interactive)
+  (advice-add 'org-insert-link :before 'ho-add-additional-space-when-not-exist))
+
+(defun ho-disable-advices ()
+  (interactive)
+  "Disable advices for working with org-mode."
+  (advice-remove 'org-insert-link 'ho-add-additional-space-when-not-exist))
 
 (provide 'husky-org)
 

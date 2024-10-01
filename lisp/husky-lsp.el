@@ -1,4 +1,4 @@
-;;;; husky-actions.el --- Collection of useful actions           -*- lexical-binding: t; -*-
+;;;; husky-lsp.el --- Collection of useful lsp actions           -*- lexical-binding: t; -*-
 ;; Copyright (C) 2024 Artur Yaroshenko
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
@@ -19,7 +19,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Collection of useful actions.
+;; Collection of useful lsp actions.
 
 ;;; Code:
 
@@ -27,53 +27,11 @@
 
 
 ;;;###autoload
-(defun ha-delete-this-file (&optional path force-p)
-  "Delete PATH, kill its buffers and expunge it from vc/magit cache.
-If PATH is not specified, default to the current buffer's file.
-If FORCE-P, delete without confirmation."
-  (interactive
-   (list (buffer-file-name (buffer-base-buffer))
-         current-prefix-arg))
-  (let* ((path (or path (buffer-file-name (buffer-base-buffer))))
-         (short-path (and path (abbreviate-file-name path))))
-    (unless path
-      (user-error "Buffer is not visiting any file"))
-    (unless (file-exists-p path)
-      (error "File doesn't exist: %s" path))
-    (unless (or force-p (y-or-n-p (format "Really delete %S?" short-path)))
-      (user-error "Aborted"))
-    (let ((buf (current-buffer)))
-      (unwind-protect
-          (progn (delete-file path t) t)
-        (if (file-exists-p path)
-            (error "Failed to delete %S" short-path)
-          (kill-buffer buf))))))
-
-;;;###autoload
-(defun ha-open-messages ()
-  "Open *Messages* buffer."
-  (interactive)
-  (if (one-window-p)
-      (split-window-horizontally))
-  (pop-to-buffer "*Messages*"))
-
-;;;###autoload
-(defun ha-open-clear-messages ()
-  "Open *Messages* buffer and clear it."
-  (interactive)
-  (if (one-window-p)
-      (split-window-horizontally))
-  (pop-to-buffer "*Messages*")
-  (read-only-mode -1)
-  (erase-buffer)
-  (read-only-mode 1))
-
-;;;###autoload
-(defun ha-find-definition ()
+(defun hl-find-definition ()
   "Find lsp definition when lsp exist and enabled, or find xref definition."
   (interactive)
   (cond ((and (bound-and-true-p lsp-bridge-mode) (fboundp 'lsp-bridge-find-def)) (lsp-bridge-find-def))
-        ((and (bound-and-true-p eglot--managed-mode) eglot--managed-mode) (xref-find-definitions))
+        ((and (bound-and-true-p eglot--managed-mode) eglot--managed-mode) (call-interactively 'xref-find-definitions))
         ((and (bound-and-true-p lsp-mode)
               (bound-and-true-p lsp-ui-mode)
               lsp-ui-mode
@@ -88,21 +46,22 @@ If FORCE-P, delete without confirmation."
          (evil-goto-definition))
         (t (call-interactively 'xref-find-definitions))))
 
+;; TODO: master navigation
 ;;;###autoload
-(defun ha-avy-go-to-definition ()
-  "Call `avy-goto-word-1' and then `ha-find-definition'."
+(defun hl-avy-go-to-definition ()
+  "Call `avy-goto-word-1' and then `hl-find-definition'."
   (interactive)
   (when (fboundp 'avy-goto-word-1)
     (call-interactively 'avy-goto-word-1)
-    (ha-find-definition)))
+    (hl-find-definition)))
 
 ;;;###autoload
-(defun ha-copy-to-register-1 ()
+(defun hl-copy-to-register-1 ()
   "Copy current line or selection to register 1.
 
 See also:
-`ha-copy-to-register-1'
-`ha-paste-from-register-1'
+`hl-copy-to-register-1'
+`hl-paste-from-register-1'
 
 URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
 Version: 2012-07-17 2022-10-03 2023-04-07"
@@ -114,9 +73,9 @@ Version: 2012-07-17 2022-10-03 2023-04-07"
     (copy-to-register ?1 xp1 xp2)))
 
 ;;;###autoload
-(defun ha-paste-from-register-1 ()
+(defun hl-paste-from-register-1 ()
   "Paste text from register 1.
-See also: `ha-copy-to-register-1', `insert-register'.
+See also: `hl-copy-to-register-1', `insert-register'.
 URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
 Version 2015-12-08"
   (interactive)
@@ -125,10 +84,26 @@ Version 2015-12-08"
   (insert-register ?1 t))
 
 
-(provide 'husky-actions)
+;;;###autoload
+(defun hl-repeat-consult-search-forward ()
+  "Repeat last search forward."
+  (interactive)
+  (when (boundp 'consult--line-history)
+    (search-forward (car consult--line-history))))
+
+
+;;;###autoload
+(defun hl-repeat-consult-search-backward ()
+  "Repeat last search backward."
+  (interactive)
+  (when (boundp 'consult--line-history)
+    (search-backward (car consult--line-history))))
+
+
+(provide 'husky-lsp)
 
 ;; Local Variables:
-;; read-symbol-shorthands: (("ha-" . "husky-actions-"))
+;; read-symbol-shorthands: (("hl-" . "husky-lsp-"))
 ;; End:
 
-;;; husky-actions.el ends here
+;;; husky-lsp.el ends here

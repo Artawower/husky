@@ -1,9 +1,9 @@
-;;;; husky.el --- Huskey framework 🐾           -*- lexical-binding: t; -*-
+;;;; husky-window-manager.el --- Collection of useful functions to work with windows and buffers           -*- lexical-binding: t; -*-
 ;; Copyright (C) 2024 Artur Yaroshenko
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
-;; Package-Requires: ((emacs "29.1"))
-;; Version: 0.0.5
+;; Package-Requires: ((emacs "29.1") (husky-tools "0.0.1"))
+;; Version: 0.0.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -19,20 +19,27 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; 
+;; Collection of useful actions to work with windows.
 
 ;;; Code:
 
-
 (require 'husky-tools)
-(require 'husky-org)
-(require 'husky-fold)
-(require 'husky-lsp)
-(require 'husky-edit)
-(require 'husky-navigation)
-(require 'husky-treesit)
-(require 'husky-buffers)
-(require 'husky-window-manager)
 
-(provide 'husky)
-;;; husky.el ends here
+;;;###autoload
+(defun hw-toggle-maximize-buffer ()
+	"Maximize buffer."
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_)
+    (progn
+      (window-configuration-to-register '_)
+      (delete-other-windows))))
+
+
+(provide 'husky-window-manager)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("hw-" . "husky-window-manager-"))
+;; End:
+
+;;; husky-window-maanger.el ends here

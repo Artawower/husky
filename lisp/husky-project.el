@@ -28,9 +28,17 @@
 ;;;###autoload
 (defun hp-find-file ()
   "Find file in project."
+  (interactive)
   (cond ((fboundp 'consult-projectile-find-file) (call-interactively 'consult-projectile-find-file))
         ((fboundp 'projectile-find-file) (call-interactively 'projectile-find-file))
         ((fboundp 'project-find-file) (call-interactively 'project-find-file))))
+
+;;;###autoload
+(defun hp-switch-to-buffer ()
+  "Switch to buffer for current project."
+  (interactive)
+  (cond ((fboundp 'consult-projectile-switch-to-buffer) (call-interactively 'consult-projectile-switch-to-buffer))
+        ((fboundp 'consult-buffer) (call-interactively 'consult-buffer))))
 
 (provide 'husky-project)
 

@@ -133,7 +133,7 @@ If FORCE-P, delete without confirmation."
   "Open project buffer from current directory to the side."
   (interactive)
   (hb-open-to-side)
-  (call-interactively 'consult-projectile-switch-to-buffer))
+  (call-interactively 'husky-project-switch-to-buffer))
 
 ;;;###autoload
 (defun hb-side-husky-actions-find-definition ()

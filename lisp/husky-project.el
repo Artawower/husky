@@ -1,9 +1,9 @@
-;;;; husky.el --- Huskey framework 🐾           -*- lexical-binding: t; -*-
+;;;; husky-project.el --- Collection of useful functions to work with project and projectile           -*- lexical-binding: t; -*-
 ;; Copyright (C) 2024 Artur Yaroshenko
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
-;; Package-Requires: ((emacs "29.1"))
-;; Version: 0.0.5
+;; Package-Requires: ((emacs "29.1") (husky-tools "0.0.1"))
+;; Version: 0.0.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -19,21 +19,23 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; 
+;; Collection of useful actions to work with project and projectile.
 
 ;;; Code:
 
-
 (require 'husky-tools)
-(require 'husky-org)
-(require 'husky-fold)
-(require 'husky-lsp)
-(require 'husky-edit)
-(require 'husky-navigation)
-(require 'husky-treesit)
-(require 'husky-buffers)
-(require 'husky-window-manager)
-(require 'husky-project)
 
-(provide 'husky)
-;;; husky.el ends here
+;;;###autoload
+(defun hp-find-file ()
+  "Find file in project."
+  (cond ((fboundp 'consult-projectile-find-file) (call-interactively 'consult-projectile-find-file))
+        ((fboundp 'projectile-find-file) (call-interactively 'projectile-find-file))
+        ((fboundp 'project-find-file) (call-interactively 'project-find-file))))
+
+(provide 'husky-project)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("hp-" . "husky-project-"))
+;; End:
+
+;;; husky-project.el ends here

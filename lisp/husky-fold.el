@@ -130,7 +130,10 @@
 
 (defun hf--treesit-fold-fn-called-p (fn &rest args)
   "Return t and call FN with ARGS when FN present."
-  (when (and (bound-and-true-p treesit-mode) (fboundp fn))
+  (when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-at (point))
+             (fboundp fn))
     (apply fn args)
     t))
 

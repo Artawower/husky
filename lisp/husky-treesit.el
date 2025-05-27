@@ -180,6 +180,8 @@ for matched languages."
   :group 'husky-treesit
   (if husky-treesit-mode
       (progn
+        (when (member major-mode '(typescript-ts-mode) (ht-setup-typescript-highlights)))
+        (when (member major-mode '(html-ts-mode) (ht-setup-html-highlights)))
         (add-hook 'typescript-ts-mode-hook #'ht-setup-typescript-highlights)
         (add-hook 'html-ts-mode-hook #'ht-setup-html-highlights))
     (remove-hook 'typescript-ts-mode-hook #'ht-setup-typescript-highlights)

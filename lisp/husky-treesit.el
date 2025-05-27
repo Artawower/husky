@@ -165,6 +165,23 @@
 
 
 ;;;###autoload
+(defvar ht-mode-setups
+  '((typescript-ts-mode . ht-setup-typescript-highlights)
+    (html-ts-mode . ht-setup-html-highlights))
+  "Alist of major modes and their corresponding setup functions.")
+
+(defvar ht-mode-setups
+  '((typescript-ts-mode . ht-setup-typescript-highlights)
+    (html-ts-mode . ht-setup-html-highlights))
+  "Alist of major modes and their corresponding setup functions.")
+
+(defun ht-make-hook-function (setup-fn)
+  "Create a hook function that calls SETUP-FN when husky-treesit-mode is active."
+  (lambda ()
+    (when husky-treesit-mode
+      (funcall setup-fn)
+      (font-lock-flush))))
+
 (define-minor-mode husky-treesit-mode
   "Husky treesit mode for better higlight.
 Interactively with no argument, this command toggles the mode.
@@ -180,12 +197,33 @@ for matched languages."
   :group 'husky-treesit
   (if husky-treesit-mode
       (progn
-        (when (member major-mode '(typescript-ts-mode) (ht-setup-typescript-highlights)))
-        (when (member major-mode '(html-ts-mode) (ht-setup-html-highlights)))
-        (add-hook 'typescript-ts-mode-hook #'ht-setup-typescript-highlights)
-        (add-hook 'html-ts-mode-hook #'ht-setup-html-highlights))
-    (remove-hook 'typescript-ts-mode-hook #'ht-setup-typescript-highlights)
-    (remove-hook 'html-ts-mode-hook #'ht-setup-html-highlights)))
+        (dolist (setup ht-mode-setups)
+          (let ((mode (car setup))
+                (setup-fn (cdr setup)))
+            (when (eq major-mode mode)
+              (funcall setup-fn)
+              (font-lock-flush))))
+        (dolist (setup ht-mode-setups)
+          (let ((mode (car setup))
+                (setup-fn (cdr setup)))
+            (let ((hook-name (intern (concat (symbol-name mode) "-hook"))))
+              (add-hook hook-name (ht-make-hook-function setup-fn))))))
+    
+    (dolist (setup ht-mode-setups)
+      (let ((mode (car setup))
+            (setup-fn (cdr setup)))
+        (let ((hook-name (intern (concat (symbol-name mode) "-hook"))))
+          (remove-hook hook-name (ht-make-hook-function setup-fn)))))))
+
+(defun ht-refresh-highlights ()
+  "Re-apply the treesit highlighting for the current buffer."
+  (interactive)
+  (when husky-treesit-mode
+    (let* ((mode major-mode)
+           (setup (assoc mode ht-mode-setups)))
+      (when setup
+        (funcall (cdr setup))
+        (font-lock-flush)))))
 
 ;;;###autoload
 (define-globalized-minor-mode

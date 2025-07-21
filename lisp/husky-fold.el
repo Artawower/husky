@@ -31,9 +31,9 @@
 ;;;###autoload
 (defun hf-close-all ()
   "Close all folds."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-close-all-folds)
+      (hf--outline-fold-fn-called-p 'outline-hide-body)
       (hf--origami-fold-fn-called-p 'origami-close-all-nodes (current-buffer))
       (hf--treesit-fold-fn-called-p 'treesit-fold-close-all)
       (hf--no-folding-provided-msg)))
@@ -41,20 +41,19 @@
 ;;;###autoload
 (defun hf-close ()
   "Close the fold under the cursor."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-close-fold)
+      (hf--outline-fold-fn-called-p 'outline-hide-subtree)
       (hf--origami-fold-fn-called-p 'origami-close-node (current-buffer) (point))
       (hf--treesit-fold-fn-called-p 'treesit-fold-close)
       (hf--no-folding-provided-msg)))
 
-
 ;;;###autoload
 (defun hf-open-all ()
   "Open all folds."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-open-all-folds)
+      (hf--outline-fold-fn-called-p 'outline-show-all)
       (hf--origami-fold-fn-called-p 'origami-open-all-nodes (current-buffer))
       (hf--treesit-fold-fn-called-p 'treesit-fold-open-all)
       (hf--evil-fold-fn-called-p 'evil-open-folds)
@@ -63,9 +62,9 @@
 ;;;###autoload
 (defun hf-open ()
   "Open the fold under the cursor."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-open-fold)
+      (hf--outline-fold-fn-called-p 'outline-show-subtree)
       (hf--origami-fold-fn-called-p 'origami-open-node (current-buffer) (point))
       (hf--treesit-fold-fn-called-p 'treesit-fold-open)
       (hf--evil-fold-fn-called-p 'evil-open-fold)
@@ -74,9 +73,9 @@
 ;;;###autoload
 (defun hf-toggle-all ()
   "Toggle all folds."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'ignore)
+      (hf--outline-fold-fn-called-p 'outline-toggle-children)
       (hf--origami-fold-fn-called-p 'origami-toggle-all-nodes (current-buffer))
       (hf--treesit-fold-fn-called-p 'treesit-fold-toggle-all)
       (hf--evil-fold-fn-called-p 'evil-toggle-folds)
@@ -85,11 +84,11 @@
 ;;;###autoload
 (defun hf-toggle ()
   "Toggle fold at point."
-
   (interactive)
   (save-excursion
     (end-of-line)
     (or (hf--org-fold-fn-called-p 'husky-org-toggle-fold)
+        (hf--outline-fold-fn-called-p 'outline-toggle-children)
         (hf--origami-fold-fn-called-p 'origami-toggle-node (current-buffer) (point))
         (hf--treesit-fold-fn-called-p 'treesit-fold-toggle)
         (hf--evil-fold-fn-called-p 'evil-toggle-fold)
@@ -98,9 +97,9 @@
 ;;;###autoload
 (defun hf-next ()
   "Go to the next fold."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-next-fold)
+      (hf--outline-fold-fn-called-p 'outline-next-visible-heading 1)
       (hf--origami-fold-fn-called-p 'origami-next-fold (current-buffer) (point))
       (hf--treesit-fold-fn-called-p 'treesit-fold-next)
       (hf--no-folding-provided-msg)))
@@ -108,17 +107,22 @@
 ;;;###autoload
 (defun hf-previous ()
   "Go to the previous fold."
-
   (interactive)
   (or (hf--org-fold-fn-called-p 'husky-org-previous-fold)
+      (hf--outline-fold-fn-called-p 'outline-previous-visible-heading 1)
       (hf--origami-fold-fn-called-p 'origami-previous-fold (current-buffer) (point))
       (hf--treesit-fold-fn-called-p 'treesit-fold-previous)
       (hf--no-folding-provided-msg)))
 
-
 (defun hf--org-fold-fn-called-p (fn &rest args)
   "Return t and call FN with ARGS when active mode is `org-mode' and FN present."
   (when (and (equal major-mode 'org-mode) (fboundp fn))
+    (apply fn args)
+    t))
+
+(defun hf--outline-fold-fn-called-p (fn &rest args)
+  "Return t and call FN with ARGS when `outline-minor-mode` is active and FN is defined."
+  (when (and (bound-and-true-p outline-minor-mode) (fboundp fn))
     (apply fn args)
     t))
 

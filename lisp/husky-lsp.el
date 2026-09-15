@@ -1,9 +1,9 @@
-;;;; husky-lsp.el --- Collection of useful lsp actions           -*- lexical-binding: t; -*-
+;;; husky-lsp.el --- Collection of useful lsp actions           -*- lexical-binding: t; -*-
 ;; Copyright (C) 2024 Artur Yaroshenko
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
 ;; URL: https://github.com/artawower/husky
 ;; Package-Requires: ((emacs "29.1") (husky-tools "0.0.1"))
-;; Version: 0.0.4
+;; Version: 0.0.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,23 +28,36 @@
 
 ;;;###autoload
 (defun hl-find-definition ()
-  "Find lsp definition when lsp exist and enabled, or find xref definition."
+  "Find LSP definition when an LSP client is active, or use xref."
   (interactive)
-  (cond ((and (bound-and-true-p lsp-bridge-mode) (fboundp 'lsp-bridge-find-def)) (lsp-bridge-find-def))
-        ((and (bound-and-true-p eglot--managed-mode) eglot--managed-mode) (call-interactively 'xref-find-definitions))
-        ((and (bound-and-true-p lsp-mode)
-              (bound-and-true-p lsp-ui-mode)
-              lsp-ui-mode
-              (fboundp 'lsp-ui-peek-find-definitions))
-         (lsp-ui-peek-find-definitions))
-        ((and (bound-and-true-p lsp-mode)
-              lsp-mode
-              (fboundp 'lsp-find-definition))
-         (lsp-find-definition))
-        ((and (bound-and-true-p evil-mode)
-              (fboundp 'evil-goto-definition))
-         (evil-goto-definition))
-        (t (call-interactively 'xref-find-definitions))))
+  (cond
+   ((and (bound-and-true-p lsp-bridge-mode)
+         (fboundp 'lsp-bridge-find-def))
+    (lsp-bridge-find-def))
+
+   ((and (bound-and-true-p lsp-proxy-mode)
+         (fboundp 'lsp-proxy-find-definition))
+    (call-interactively #'lsp-proxy-find-definition))
+
+   ((bound-and-true-p eglot--managed-mode)
+    (call-interactively #'xref-find-definitions))
+
+   ((and (bound-and-true-p lsp-mode)
+         (bound-and-true-p lsp-ui-mode)
+         (fboundp 'lsp-ui-peek-find-definitions))
+    (lsp-ui-peek-find-definitions))
+
+   ((and (bound-and-true-p lsp-mode)
+         (fboundp 'lsp-find-definition))
+    (lsp-find-definition))
+
+   ((and (bound-and-true-p evil-mode)
+         (fboundp 'evil-goto-definition))
+    (evil-goto-definition))
+
+   (t
+    (call-interactively #'xref-find-definitions))))
+
 
 ;; TODO: master navigation
 ;;;###autoload
@@ -52,8 +65,9 @@
   "Call `avy-goto-word-1' and then `hl-find-definition'."
   (interactive)
   (when (fboundp 'avy-goto-word-1)
-    (call-interactively 'avy-goto-word-1)
+    (call-interactively #'avy-goto-word-1)
     (hl-find-definition)))
+
 
 ;;;###autoload
 (defun hl-copy-to-register-1 ()
@@ -68,14 +82,20 @@ Version: 2012-07-17 2022-10-03 2023-04-07"
   (interactive)
   (let (xp1 xp2)
     (if (region-active-p)
-        (setq xp1 (region-beginning) xp2 (region-end))
-      (setq xp1 (line-beginning-position) xp2 (line-end-position)))
+        (setq xp1 (region-beginning)
+              xp2 (region-end))
+      (setq xp1 (line-beginning-position)
+            xp2 (line-end-position)))
     (copy-to-register ?1 xp1 xp2)))
+
 
 ;;;###autoload
 (defun hl-paste-from-register-1 ()
   "Paste text from register 1.
-See also: `hl-copy-to-register-1', `insert-register'.
+
+See also:
+`hl-copy-to-register-1', `insert-register'.
+
 URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
 Version 2015-12-08"
   (interactive)
